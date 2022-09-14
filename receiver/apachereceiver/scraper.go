@@ -117,7 +117,7 @@ func (r *apacheScraper) scrape(context.Context) (pmetric.Metrics, error) {
 				errs,
 				r.mb.RecordApacheCPUTimeDataPoint(now, metricValue, r.cfg.serverName, metadata.AttributeCPULevelSelf, metadata.AttributeCPUModeUser),
 			)
-		case "CPULoad":
+		case "Unexisting":
 			addPartialIfError(errs, r.mb.RecordApacheCPULoadDataPoint(now, metricValue, r.cfg.serverName))
 		case "DurationPerReq":
 			addPartialIfError(errs, r.mb.RecordApacheRequestAverageTimeDataPoint(now, metricValue, r.cfg.serverName))
