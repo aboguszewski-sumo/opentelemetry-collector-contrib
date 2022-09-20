@@ -271,6 +271,50 @@ func (m *mySQLScraper) scrape(context.Context) (pmetric.Metrics, error) {
 		}
 	}
 
+	// collect table_io_waits metrics.
+	tableIoWaitsStats, err := m.sqlclient.getTableIoWaitsStats()
+	if err != nil {
+		m.logger.Error("Failed to fetch table io_waits stats", zap.Error(err))
+		errs.AddPartial(1, err)
+	}
+
+	for i := 0; i < len(tableIoWaitsStats); i++ {
+		s := tableIoWaitsStats[i]
+		// counts
+		m.mb.RecordMysqlTableIoWaitsDataPoint(now, s.countDelete, metadata.AttributeIoWaitsOperationsDelete, s.name, s.schema)
+		m.mb.RecordMysqlTableIoWaitsDataPoint(now, s.countFetch, metadata.AttributeIoWaitsOperationsFetch, s.name, s.schema)
+		m.mb.RecordMysqlTableIoWaitsDataPoint(now, s.countInsert, metadata.AttributeIoWaitsOperationsInsert, s.name, s.schema)
+		m.mb.RecordMysqlTableIoWaitsDataPoint(now, s.countUpdate, metadata.AttributeIoWaitsOperationsUpdate, s.name, s.schema)
+
+		// times
+		m.mb.RecordMysqlTableIoWaitsTimeDataPoint(now, s.timeDelete, metadata.AttributeIoWaitsOperationsDelete, s.name, s.schema)
+		m.mb.RecordMysqlTableIoWaitsTimeDataPoint(now, s.timeFetch, metadata.AttributeIoWaitsOperationsFetch, s.name, s.schema)
+		m.mb.RecordMysqlTableIoWaitsTimeDataPoint(now, s.timeInsert, metadata.AttributeIoWaitsOperationsInsert, s.name, s.schema)
+		m.mb.RecordMysqlTableIoWaitsTimeDataPoint(now, s.timeUpdate, metadata.AttributeIoWaitsOperationsUpdate, s.name, s.schema)
+	}
+
+	// collect index_io_waits metrics.
+	indexIoWaitsStats, err := m.sqlclient.getIndexIoWaitsStats()
+	if err != nil {
+		m.logger.Error("Failed to fetch index io_waits stats", zap.Error(err))
+		errs.AddPartial(1, err)
+	}
+
+	for i := 0; i < len(indexIoWaitsStats); i++ {
+		s := indexIoWaitsStats[i]
+		// counts
+		m.mb.RecordMysqlIndexIoWaitsDataPoint(now, s.countDelete, metadata.AttributeIoWaitsOperationsDelete, s.name, s.schema, s.index)
+		m.mb.RecordMysqlIndexIoWaitsDataPoint(now, s.countFetch, metadata.AttributeIoWaitsOperationsFetch, s.name, s.schema, s.index)
+		m.mb.RecordMysqlIndexIoWaitsDataPoint(now, s.countInsert, metadata.AttributeIoWaitsOperationsInsert, s.name, s.schema, s.index)
+		m.mb.RecordMysqlIndexIoWaitsDataPoint(now, s.countUpdate, metadata.AttributeIoWaitsOperationsUpdate, s.name, s.schema, s.index)
+
+		// times
+		m.mb.RecordMysqlIndexIoWaitsTimeDataPoint(now, s.timeDelete, metadata.AttributeIoWaitsOperationsDelete, s.name, s.schema, s.index)
+		m.mb.RecordMysqlIndexIoWaitsTimeDataPoint(now, s.timeFetch, metadata.AttributeIoWaitsOperationsFetch, s.name, s.schema, s.index)
+		m.mb.RecordMysqlIndexIoWaitsTimeDataPoint(now, s.timeInsert, metadata.AttributeIoWaitsOperationsInsert, s.name, s.schema, s.index)
+		m.mb.RecordMysqlIndexIoWaitsTimeDataPoint(now, s.timeUpdate, metadata.AttributeIoWaitsOperationsUpdate, s.name, s.schema, s.index)
+	}
+
 	return m.mb.Emit(), errs.Combine()
 }
 

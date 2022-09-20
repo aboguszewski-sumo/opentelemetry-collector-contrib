@@ -57,6 +57,19 @@ attributes:
     value: kind
     description: The thread count type.
     enum: [cached, connected, created, running]
+  schema:
+    value: schema
+    description: The schema of the object.
+  io_waits_operations:
+    value: operation
+    description: The io_waits operation type.
+    enum: [delete, fetch, insert, update]
+  io_waits_name:
+    value: name
+    description: Table name for event or process.
+  io_waits_index:
+    value: index
+    description: The name of the index.
 
 metrics:
   mysql.buffer_pool.pages:
@@ -175,6 +188,42 @@ metrics:
       monotonic: true
       aggregation: cumulative
     attributes: [page_operations]
+  mysql.table.io_waits:
+    enabled: true
+    description: The total count of I/O waits events for a table.
+    unit: 1
+    sum:
+      value_type: int
+      monotonic: true
+      aggregation: cumulative
+    attributes: [io_waits_operations, io_waits_name, schema]
+  mysql.table.io_waits.time:
+    enabled: true
+    description: The total time of I/O waits events for a table.
+    unit: ms
+    sum:
+      value_type: int
+      monotonic: true
+      aggregation: cumulative
+    attributes: [io_waits_operations, io_waits_name, schema]
+  mysql.index.io_waits:
+    enabled: true
+    description: The total count of I/O waits events for an index.
+    unit: 1
+    sum:
+      value_type: int
+      monotonic: true
+      aggregation: cumulative
+    attributes: [io_waits_operations, io_waits_name, schema, io_waits_index]
+  mysql.index.io_waits.time:
+    enabled: true
+    description: The total time of I/O waits events for an index.
+    unit: ms
+    sum:
+      value_type: int
+      monotonic: true
+      aggregation: cumulative
+    attributes: [io_waits_operations, io_waits_name, schema, io_waits_index]
   mysql.row_locks:
     enabled: true
     description: The number of InnoDB row locks.

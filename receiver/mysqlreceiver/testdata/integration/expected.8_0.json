@@ -1044,6 +1044,498 @@
                         ]
                      },
                      "unit": "1"
+                  },
+                  {
+                     "description": "The total count of I/O waits events for a table.",
+                     "name": "mysql.table.io_waits",
+                     "sum": {
+                        "aggregationTemporality": "AGGREGATION_TEMPORALITY_CUMULATIVE",
+                        "isMonotonic": true,
+                        "dataPoints": [
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "delete"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "fetch"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "insert"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "update"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           }
+                        ]
+                     },
+                     "unit": "1"
+                  },
+                  {
+                     "description": "The total time of I/O waits events for a table.",
+                     "name": "mysql.table.io_waits.time",
+                     "sum": {
+                        "aggregationTemporality": "AGGREGATION_TEMPORALITY_CUMULATIVE",
+                        "isMonotonic": true,
+                        "dataPoints": [
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "delete"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "fetch"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "insert"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "update"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           }
+                        ]
+                     },
+                     "unit": "ms"
+                  },
+                  {
+                     "description": "The total count of I/O waits events for an index.",
+                     "name": "mysql.index.io_waits",
+                     "sum": {
+                        "aggregationTemporality": "AGGREGATION_TEMPORALITY_CUMULATIVE",
+                        "isMonotonic": true,
+                        "dataPoints": [
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "delete"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "fetch"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "insert"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "update"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           }
+                        ]
+                     },
+                     "unit": "1"
+                  },
+                  {
+                     "description": "The total time of I/O waits events for an index.",
+                     "name": "mysql.index.io_waits.time",
+                     "sum": {
+                        "aggregationTemporality": "AGGREGATION_TEMPORALITY_CUMULATIVE",
+                        "isMonotonic": true,
+                        "dataPoints": [
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "delete"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "fetch"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "insert"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           },
+                           {
+                              "asInt": "0",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "update"
+                                    }
+                                 },
+                                 {
+                                    "key": "name",
+                                    "value": {
+                                       "stringValue": "a_table"
+                                    }
+                                 },
+                                 {
+                                    "key": "schema",
+                                    "value": {
+                                       "stringValue": "a_schema"
+                                    }
+                                 },
+                                 {
+                                    "key": "index",
+                                    "value": {
+                                       "stringValue": "an_index"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1644862687825728000",
+                              "timeUnixNano": "1644862687825772000"
+                           }
+                        ]
+                     },
+                     "unit": "ms"
                   }
                ]
             }

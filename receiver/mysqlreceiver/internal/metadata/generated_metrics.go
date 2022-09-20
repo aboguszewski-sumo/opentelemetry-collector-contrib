@@ -28,6 +28,8 @@ type MetricsSettings struct {
 	MysqlCommands              MetricSettings `mapstructure:"mysql.commands"`
 	MysqlDoubleWrites          MetricSettings `mapstructure:"mysql.double_writes"`
 	MysqlHandlers              MetricSettings `mapstructure:"mysql.handlers"`
+	MysqlIndexIoWaits          MetricSettings `mapstructure:"mysql.index.io_waits"`
+	MysqlIndexIoWaitsTime      MetricSettings `mapstructure:"mysql.index.io_waits.time"`
 	MysqlLocks                 MetricSettings `mapstructure:"mysql.locks"`
 	MysqlLogOperations         MetricSettings `mapstructure:"mysql.log_operations"`
 	MysqlOperations            MetricSettings `mapstructure:"mysql.operations"`
@@ -35,6 +37,8 @@ type MetricsSettings struct {
 	MysqlRowLocks              MetricSettings `mapstructure:"mysql.row_locks"`
 	MysqlRowOperations         MetricSettings `mapstructure:"mysql.row_operations"`
 	MysqlSorts                 MetricSettings `mapstructure:"mysql.sorts"`
+	MysqlTableIoWaits          MetricSettings `mapstructure:"mysql.table.io_waits"`
+	MysqlTableIoWaitsTime      MetricSettings `mapstructure:"mysql.table.io_waits.time"`
 	MysqlThreads               MetricSettings `mapstructure:"mysql.threads"`
 }
 
@@ -67,6 +71,12 @@ func DefaultMetricsSettings() MetricsSettings {
 		MysqlHandlers: MetricSettings{
 			Enabled: true,
 		},
+		MysqlIndexIoWaits: MetricSettings{
+			Enabled: true,
+		},
+		MysqlIndexIoWaitsTime: MetricSettings{
+			Enabled: true,
+		},
 		MysqlLocks: MetricSettings{
 			Enabled: true,
 		},
@@ -86,6 +96,12 @@ func DefaultMetricsSettings() MetricsSettings {
 			Enabled: true,
 		},
 		MysqlSorts: MetricSettings{
+			Enabled: true,
+		},
+		MysqlTableIoWaits: MetricSettings{
+			Enabled: true,
+		},
+		MysqlTableIoWaitsTime: MetricSettings{
 			Enabled: true,
 		},
 		MysqlThreads: MetricSettings{
@@ -352,6 +368,40 @@ var MapAttributeHandler = map[string]AttributeHandler{
 	"savepoint_rollback": AttributeHandlerSavepointRollback,
 	"update":             AttributeHandlerUpdate,
 	"write":              AttributeHandlerWrite,
+}
+
+// AttributeIoWaitsOperations specifies the a value io_waits_operations attribute.
+type AttributeIoWaitsOperations int
+
+const (
+	_ AttributeIoWaitsOperations = iota
+	AttributeIoWaitsOperationsDelete
+	AttributeIoWaitsOperationsFetch
+	AttributeIoWaitsOperationsInsert
+	AttributeIoWaitsOperationsUpdate
+)
+
+// String returns the string representation of the AttributeIoWaitsOperations.
+func (av AttributeIoWaitsOperations) String() string {
+	switch av {
+	case AttributeIoWaitsOperationsDelete:
+		return "delete"
+	case AttributeIoWaitsOperationsFetch:
+		return "fetch"
+	case AttributeIoWaitsOperationsInsert:
+		return "insert"
+	case AttributeIoWaitsOperationsUpdate:
+		return "update"
+	}
+	return ""
+}
+
+// MapAttributeIoWaitsOperations is a helper map of string to AttributeIoWaitsOperations attribute value.
+var MapAttributeIoWaitsOperations = map[string]AttributeIoWaitsOperations{
+	"delete": AttributeIoWaitsOperationsDelete,
+	"fetch":  AttributeIoWaitsOperationsFetch,
+	"insert": AttributeIoWaitsOperationsInsert,
+	"update": AttributeIoWaitsOperationsUpdate,
 }
 
 // AttributeLocks specifies the a value locks attribute.
@@ -1071,6 +1121,118 @@ func newMetricMysqlHandlers(settings MetricSettings) metricMysqlHandlers {
 	return m
 }
 
+type metricMysqlIndexIoWaits struct {
+	data     pmetric.Metric // data buffer for generated metric.
+	settings MetricSettings // metric settings provided by user.
+	capacity int            // max observed number of data points added to the metric.
+}
+
+// init fills mysql.index.io_waits metric with initial data.
+func (m *metricMysqlIndexIoWaits) init() {
+	m.data.SetName("mysql.index.io_waits")
+	m.data.SetDescription("The total count of I/O waits events for an index.")
+	m.data.SetUnit("1")
+	m.data.SetEmptySum()
+	m.data.Sum().SetIsMonotonic(true)
+	m.data.Sum().SetAggregationTemporality(pmetric.MetricAggregationTemporalityCumulative)
+	m.data.Sum().DataPoints().EnsureCapacity(m.capacity)
+}
+
+func (m *metricMysqlIndexIoWaits) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue string, ioWaitsNameAttributeValue string, schemaAttributeValue string, ioWaitsIndexAttributeValue string) {
+	if !m.settings.Enabled {
+		return
+	}
+	dp := m.data.Sum().DataPoints().AppendEmpty()
+	dp.SetStartTimestamp(start)
+	dp.SetTimestamp(ts)
+	dp.SetIntVal(val)
+	dp.Attributes().PutString("operation", ioWaitsOperationsAttributeValue)
+	dp.Attributes().PutString("name", ioWaitsNameAttributeValue)
+	dp.Attributes().PutString("schema", schemaAttributeValue)
+	dp.Attributes().PutString("index", ioWaitsIndexAttributeValue)
+}
+
+// updateCapacity saves max length of data point slices that will be used for the slice capacity.
+func (m *metricMysqlIndexIoWaits) updateCapacity() {
+	if m.data.Sum().DataPoints().Len() > m.capacity {
+		m.capacity = m.data.Sum().DataPoints().Len()
+	}
+}
+
+// emit appends recorded metric data to a metrics slice and prepares it for recording another set of data points.
+func (m *metricMysqlIndexIoWaits) emit(metrics pmetric.MetricSlice) {
+	if m.settings.Enabled && m.data.Sum().DataPoints().Len() > 0 {
+		m.updateCapacity()
+		m.data.MoveTo(metrics.AppendEmpty())
+		m.init()
+	}
+}
+
+func newMetricMysqlIndexIoWaits(settings MetricSettings) metricMysqlIndexIoWaits {
+	m := metricMysqlIndexIoWaits{settings: settings}
+	if settings.Enabled {
+		m.data = pmetric.NewMetric()
+		m.init()
+	}
+	return m
+}
+
+type metricMysqlIndexIoWaitsTime struct {
+	data     pmetric.Metric // data buffer for generated metric.
+	settings MetricSettings // metric settings provided by user.
+	capacity int            // max observed number of data points added to the metric.
+}
+
+// init fills mysql.index.io_waits.time metric with initial data.
+func (m *metricMysqlIndexIoWaitsTime) init() {
+	m.data.SetName("mysql.index.io_waits.time")
+	m.data.SetDescription("The total time of I/O waits events for an index.")
+	m.data.SetUnit("ms")
+	m.data.SetEmptySum()
+	m.data.Sum().SetIsMonotonic(true)
+	m.data.Sum().SetAggregationTemporality(pmetric.MetricAggregationTemporalityCumulative)
+	m.data.Sum().DataPoints().EnsureCapacity(m.capacity)
+}
+
+func (m *metricMysqlIndexIoWaitsTime) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue string, ioWaitsNameAttributeValue string, schemaAttributeValue string, ioWaitsIndexAttributeValue string) {
+	if !m.settings.Enabled {
+		return
+	}
+	dp := m.data.Sum().DataPoints().AppendEmpty()
+	dp.SetStartTimestamp(start)
+	dp.SetTimestamp(ts)
+	dp.SetIntVal(val)
+	dp.Attributes().PutString("operation", ioWaitsOperationsAttributeValue)
+	dp.Attributes().PutString("name", ioWaitsNameAttributeValue)
+	dp.Attributes().PutString("schema", schemaAttributeValue)
+	dp.Attributes().PutString("index", ioWaitsIndexAttributeValue)
+}
+
+// updateCapacity saves max length of data point slices that will be used for the slice capacity.
+func (m *metricMysqlIndexIoWaitsTime) updateCapacity() {
+	if m.data.Sum().DataPoints().Len() > m.capacity {
+		m.capacity = m.data.Sum().DataPoints().Len()
+	}
+}
+
+// emit appends recorded metric data to a metrics slice and prepares it for recording another set of data points.
+func (m *metricMysqlIndexIoWaitsTime) emit(metrics pmetric.MetricSlice) {
+	if m.settings.Enabled && m.data.Sum().DataPoints().Len() > 0 {
+		m.updateCapacity()
+		m.data.MoveTo(metrics.AppendEmpty())
+		m.init()
+	}
+}
+
+func newMetricMysqlIndexIoWaitsTime(settings MetricSettings) metricMysqlIndexIoWaitsTime {
+	m := metricMysqlIndexIoWaitsTime{settings: settings}
+	if settings.Enabled {
+		m.data = pmetric.NewMetric()
+		m.init()
+	}
+	return m
+}
+
 type metricMysqlLocks struct {
 	data     pmetric.Metric // data buffer for generated metric.
 	settings MetricSettings // metric settings provided by user.
@@ -1442,6 +1604,116 @@ func newMetricMysqlSorts(settings MetricSettings) metricMysqlSorts {
 	return m
 }
 
+type metricMysqlTableIoWaits struct {
+	data     pmetric.Metric // data buffer for generated metric.
+	settings MetricSettings // metric settings provided by user.
+	capacity int            // max observed number of data points added to the metric.
+}
+
+// init fills mysql.table.io_waits metric with initial data.
+func (m *metricMysqlTableIoWaits) init() {
+	m.data.SetName("mysql.table.io_waits")
+	m.data.SetDescription("The total count of I/O waits events for a table.")
+	m.data.SetUnit("1")
+	m.data.SetEmptySum()
+	m.data.Sum().SetIsMonotonic(true)
+	m.data.Sum().SetAggregationTemporality(pmetric.MetricAggregationTemporalityCumulative)
+	m.data.Sum().DataPoints().EnsureCapacity(m.capacity)
+}
+
+func (m *metricMysqlTableIoWaits) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue string, ioWaitsNameAttributeValue string, schemaAttributeValue string) {
+	if !m.settings.Enabled {
+		return
+	}
+	dp := m.data.Sum().DataPoints().AppendEmpty()
+	dp.SetStartTimestamp(start)
+	dp.SetTimestamp(ts)
+	dp.SetIntVal(val)
+	dp.Attributes().PutString("operation", ioWaitsOperationsAttributeValue)
+	dp.Attributes().PutString("name", ioWaitsNameAttributeValue)
+	dp.Attributes().PutString("schema", schemaAttributeValue)
+}
+
+// updateCapacity saves max length of data point slices that will be used for the slice capacity.
+func (m *metricMysqlTableIoWaits) updateCapacity() {
+	if m.data.Sum().DataPoints().Len() > m.capacity {
+		m.capacity = m.data.Sum().DataPoints().Len()
+	}
+}
+
+// emit appends recorded metric data to a metrics slice and prepares it for recording another set of data points.
+func (m *metricMysqlTableIoWaits) emit(metrics pmetric.MetricSlice) {
+	if m.settings.Enabled && m.data.Sum().DataPoints().Len() > 0 {
+		m.updateCapacity()
+		m.data.MoveTo(metrics.AppendEmpty())
+		m.init()
+	}
+}
+
+func newMetricMysqlTableIoWaits(settings MetricSettings) metricMysqlTableIoWaits {
+	m := metricMysqlTableIoWaits{settings: settings}
+	if settings.Enabled {
+		m.data = pmetric.NewMetric()
+		m.init()
+	}
+	return m
+}
+
+type metricMysqlTableIoWaitsTime struct {
+	data     pmetric.Metric // data buffer for generated metric.
+	settings MetricSettings // metric settings provided by user.
+	capacity int            // max observed number of data points added to the metric.
+}
+
+// init fills mysql.table.io_waits.time metric with initial data.
+func (m *metricMysqlTableIoWaitsTime) init() {
+	m.data.SetName("mysql.table.io_waits.time")
+	m.data.SetDescription("The total time of I/O waits events for a table.")
+	m.data.SetUnit("ms")
+	m.data.SetEmptySum()
+	m.data.Sum().SetIsMonotonic(true)
+	m.data.Sum().SetAggregationTemporality(pmetric.MetricAggregationTemporalityCumulative)
+	m.data.Sum().DataPoints().EnsureCapacity(m.capacity)
+}
+
+func (m *metricMysqlTableIoWaitsTime) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue string, ioWaitsNameAttributeValue string, schemaAttributeValue string) {
+	if !m.settings.Enabled {
+		return
+	}
+	dp := m.data.Sum().DataPoints().AppendEmpty()
+	dp.SetStartTimestamp(start)
+	dp.SetTimestamp(ts)
+	dp.SetIntVal(val)
+	dp.Attributes().PutString("operation", ioWaitsOperationsAttributeValue)
+	dp.Attributes().PutString("name", ioWaitsNameAttributeValue)
+	dp.Attributes().PutString("schema", schemaAttributeValue)
+}
+
+// updateCapacity saves max length of data point slices that will be used for the slice capacity.
+func (m *metricMysqlTableIoWaitsTime) updateCapacity() {
+	if m.data.Sum().DataPoints().Len() > m.capacity {
+		m.capacity = m.data.Sum().DataPoints().Len()
+	}
+}
+
+// emit appends recorded metric data to a metrics slice and prepares it for recording another set of data points.
+func (m *metricMysqlTableIoWaitsTime) emit(metrics pmetric.MetricSlice) {
+	if m.settings.Enabled && m.data.Sum().DataPoints().Len() > 0 {
+		m.updateCapacity()
+		m.data.MoveTo(metrics.AppendEmpty())
+		m.init()
+	}
+}
+
+func newMetricMysqlTableIoWaitsTime(settings MetricSettings) metricMysqlTableIoWaitsTime {
+	m := metricMysqlTableIoWaitsTime{settings: settings}
+	if settings.Enabled {
+		m.data = pmetric.NewMetric()
+		m.init()
+	}
+	return m
+}
+
 type metricMysqlThreads struct {
 	data     pmetric.Metric // data buffer for generated metric.
 	settings MetricSettings // metric settings provided by user.
@@ -1512,6 +1784,8 @@ type MetricsBuilder struct {
 	metricMysqlCommands              metricMysqlCommands
 	metricMysqlDoubleWrites          metricMysqlDoubleWrites
 	metricMysqlHandlers              metricMysqlHandlers
+	metricMysqlIndexIoWaits          metricMysqlIndexIoWaits
+	metricMysqlIndexIoWaitsTime      metricMysqlIndexIoWaitsTime
 	metricMysqlLocks                 metricMysqlLocks
 	metricMysqlLogOperations         metricMysqlLogOperations
 	metricMysqlOperations            metricMysqlOperations
@@ -1519,6 +1793,8 @@ type MetricsBuilder struct {
 	metricMysqlRowLocks              metricMysqlRowLocks
 	metricMysqlRowOperations         metricMysqlRowOperations
 	metricMysqlSorts                 metricMysqlSorts
+	metricMysqlTableIoWaits          metricMysqlTableIoWaits
+	metricMysqlTableIoWaitsTime      metricMysqlTableIoWaitsTime
 	metricMysqlThreads               metricMysqlThreads
 }
 
@@ -1546,6 +1822,8 @@ func NewMetricsBuilder(settings MetricsSettings, buildInfo component.BuildInfo, 
 		metricMysqlCommands:              newMetricMysqlCommands(settings.MysqlCommands),
 		metricMysqlDoubleWrites:          newMetricMysqlDoubleWrites(settings.MysqlDoubleWrites),
 		metricMysqlHandlers:              newMetricMysqlHandlers(settings.MysqlHandlers),
+		metricMysqlIndexIoWaits:          newMetricMysqlIndexIoWaits(settings.MysqlIndexIoWaits),
+		metricMysqlIndexIoWaitsTime:      newMetricMysqlIndexIoWaitsTime(settings.MysqlIndexIoWaitsTime),
 		metricMysqlLocks:                 newMetricMysqlLocks(settings.MysqlLocks),
 		metricMysqlLogOperations:         newMetricMysqlLogOperations(settings.MysqlLogOperations),
 		metricMysqlOperations:            newMetricMysqlOperations(settings.MysqlOperations),
@@ -1553,6 +1831,8 @@ func NewMetricsBuilder(settings MetricsSettings, buildInfo component.BuildInfo, 
 		metricMysqlRowLocks:              newMetricMysqlRowLocks(settings.MysqlRowLocks),
 		metricMysqlRowOperations:         newMetricMysqlRowOperations(settings.MysqlRowOperations),
 		metricMysqlSorts:                 newMetricMysqlSorts(settings.MysqlSorts),
+		metricMysqlTableIoWaits:          newMetricMysqlTableIoWaits(settings.MysqlTableIoWaits),
+		metricMysqlTableIoWaitsTime:      newMetricMysqlTableIoWaitsTime(settings.MysqlTableIoWaitsTime),
 		metricMysqlThreads:               newMetricMysqlThreads(settings.MysqlThreads),
 	}
 	for _, op := range options {
@@ -1615,6 +1895,8 @@ func (mb *MetricsBuilder) EmitForResource(rmo ...ResourceMetricsOption) {
 	mb.metricMysqlCommands.emit(ils.Metrics())
 	mb.metricMysqlDoubleWrites.emit(ils.Metrics())
 	mb.metricMysqlHandlers.emit(ils.Metrics())
+	mb.metricMysqlIndexIoWaits.emit(ils.Metrics())
+	mb.metricMysqlIndexIoWaitsTime.emit(ils.Metrics())
 	mb.metricMysqlLocks.emit(ils.Metrics())
 	mb.metricMysqlLogOperations.emit(ils.Metrics())
 	mb.metricMysqlOperations.emit(ils.Metrics())
@@ -1622,6 +1904,8 @@ func (mb *MetricsBuilder) EmitForResource(rmo ...ResourceMetricsOption) {
 	mb.metricMysqlRowLocks.emit(ils.Metrics())
 	mb.metricMysqlRowOperations.emit(ils.Metrics())
 	mb.metricMysqlSorts.emit(ils.Metrics())
+	mb.metricMysqlTableIoWaits.emit(ils.Metrics())
+	mb.metricMysqlTableIoWaitsTime.emit(ils.Metrics())
 	mb.metricMysqlThreads.emit(ils.Metrics())
 	for _, op := range rmo {
 		op(rm)
@@ -1722,6 +2006,16 @@ func (mb *MetricsBuilder) RecordMysqlHandlersDataPoint(ts pcommon.Timestamp, inp
 	return nil
 }
 
+// RecordMysqlIndexIoWaitsDataPoint adds a data point to mysql.index.io_waits metric.
+func (mb *MetricsBuilder) RecordMysqlIndexIoWaitsDataPoint(ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue AttributeIoWaitsOperations, ioWaitsNameAttributeValue string, schemaAttributeValue string, ioWaitsIndexAttributeValue string) {
+	mb.metricMysqlIndexIoWaits.recordDataPoint(mb.startTime, ts, val, ioWaitsOperationsAttributeValue.String(), ioWaitsNameAttributeValue, schemaAttributeValue, ioWaitsIndexAttributeValue)
+}
+
+// RecordMysqlIndexIoWaitsTimeDataPoint adds a data point to mysql.index.io_waits.time metric.
+func (mb *MetricsBuilder) RecordMysqlIndexIoWaitsTimeDataPoint(ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue AttributeIoWaitsOperations, ioWaitsNameAttributeValue string, schemaAttributeValue string, ioWaitsIndexAttributeValue string) {
+	mb.metricMysqlIndexIoWaitsTime.recordDataPoint(mb.startTime, ts, val, ioWaitsOperationsAttributeValue.String(), ioWaitsNameAttributeValue, schemaAttributeValue, ioWaitsIndexAttributeValue)
+}
+
 // RecordMysqlLocksDataPoint adds a data point to mysql.locks metric.
 func (mb *MetricsBuilder) RecordMysqlLocksDataPoint(ts pcommon.Timestamp, inputVal string, locksAttributeValue AttributeLocks) error {
 	val, err := strconv.ParseInt(inputVal, 10, 64)
@@ -1790,6 +2084,16 @@ func (mb *MetricsBuilder) RecordMysqlSortsDataPoint(ts pcommon.Timestamp, inputV
 	}
 	mb.metricMysqlSorts.recordDataPoint(mb.startTime, ts, val, sortsAttributeValue.String())
 	return nil
+}
+
+// RecordMysqlTableIoWaitsDataPoint adds a data point to mysql.table.io_waits metric.
+func (mb *MetricsBuilder) RecordMysqlTableIoWaitsDataPoint(ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue AttributeIoWaitsOperations, ioWaitsNameAttributeValue string, schemaAttributeValue string) {
+	mb.metricMysqlTableIoWaits.recordDataPoint(mb.startTime, ts, val, ioWaitsOperationsAttributeValue.String(), ioWaitsNameAttributeValue, schemaAttributeValue)
+}
+
+// RecordMysqlTableIoWaitsTimeDataPoint adds a data point to mysql.table.io_waits.time metric.
+func (mb *MetricsBuilder) RecordMysqlTableIoWaitsTimeDataPoint(ts pcommon.Timestamp, val int64, ioWaitsOperationsAttributeValue AttributeIoWaitsOperations, ioWaitsNameAttributeValue string, schemaAttributeValue string) {
+	mb.metricMysqlTableIoWaitsTime.recordDataPoint(mb.startTime, ts, val, ioWaitsOperationsAttributeValue.String(), ioWaitsNameAttributeValue, schemaAttributeValue)
 }
 
 // RecordMysqlThreadsDataPoint adds a data point to mysql.threads metric.
