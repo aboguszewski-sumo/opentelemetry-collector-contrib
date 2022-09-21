@@ -35,6 +35,12 @@ metrics:
     enabled: <true|false>
 ```
 
+## Resource attributes
+
+| Name | Description | Type |
+| ---- | ----------- | ---- |
+| endpoint | Endpoint of the mysql instance. | String |
+
 ## Metric attributes
 
 | Name | Description | Values |

@@ -1048,7 +1048,16 @@
                ]
             }
          ],
-         "resource": {}
+         "resource": {
+            "attributes": [
+               {
+                  "key": "endpoint",
+                  "value": {
+                     "stringValue": "localhost:3307"
+                  }
+               }
+            ]
+         }
       }
    ]
 }
