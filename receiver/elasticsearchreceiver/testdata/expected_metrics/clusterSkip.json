@@ -2322,6 +2322,44 @@
                               ],
                               "startTimeUnixNano": "1661811689941624000",
                               "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "40",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "index"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "4",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "delete"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
                            }
                         ]
                      },
@@ -2366,6 +2404,44 @@
                                     "key": "aggregation",
                                     "value": {
                                        "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "938",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "index"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "938",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "index"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "primary_shards"
                                     }
                                  }
                               ],
@@ -2448,6 +2524,44 @@
                               ],
                               "startTimeUnixNano": "1661811689941624000",
                               "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "40",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "index"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "4",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "delete"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
                            }
                         ]
                      },
@@ -2492,6 +2606,44 @@
                                     "key": "aggregation",
                                     "value": {
                                        "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "938",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "index"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "938",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "index"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "primary_shards"
                                     }
                                  }
                               ],
