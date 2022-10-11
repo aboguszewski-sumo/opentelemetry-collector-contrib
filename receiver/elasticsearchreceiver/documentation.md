@@ -22,6 +22,7 @@ These are the metrics available for this scraper.
 | **elasticsearch.cluster.state_queue** | Number of cluster states in queue. | 1 | Sum(Int) | <ul> <li>cluster_state_queue_state</li> </ul> |
 | **elasticsearch.cluster.state_update.count** | The number of cluster state update attempts that changed the cluster state since the node started. | 1 | Sum(Int) | <ul> <li>cluster_state_update_state</li> </ul> |
 | **elasticsearch.cluster.state_update.time** | The cumulative amount of time updating the cluster state since the node started. | ms | Sum(Int) | <ul> <li>cluster_state_update_state</li> <li>cluster_state_update_type</li> </ul> |
+| **elasticsearch.index.cache.evictions** | The number of evictions from the cache for an index. | {evictions} | Sum(Int) | <ul> <li>cache_name</li> <li>index_aggregation_type</li> </ul> |
 | **elasticsearch.index.cache.memory.usage** | The size in bytes of the cache for an index. | By | Sum(Int) | <ul> <li>cache_name</li> <li>index_aggregation_type</li> </ul> |
 | **elasticsearch.index.operations.completed** | The number of operations completed for an index. | {operations} | Sum(Int) | <ul> <li>operation</li> <li>index_aggregation_type</li> </ul> |
 | **elasticsearch.index.operations.merge.docs_count** | The total number of documents in merge operations for an index. | {documents} | Sum(Int) | <ul> <li>index_aggregation_type</li> </ul> |
@@ -35,8 +36,8 @@ These are the metrics available for this scraper.
 | **elasticsearch.indexing_pressure.memory.total.replica_rejections** | Number of indexing requests rejected in the replica stage. | 1 | Sum(Int) | <ul> </ul> |
 | **elasticsearch.memory.indexing_pressure** | Memory consumed, in bytes, by indexing requests in the specified stage. | By | Sum(Int) | <ul> <li>indexing_pressure_stage</li> </ul> |
 | **elasticsearch.node.cache.count** | Total count of query cache misses across all shards assigned to selected nodes. | {count} | Sum(Int) | <ul> <li>query_cache_count_type</li> </ul> |
-| **elasticsearch.node.cache.evictions** | The number of evictions from the cache. | {evictions} | Sum(Int) | <ul> <li>cache_name</li> </ul> |
-| **elasticsearch.node.cache.memory.usage** | The size in bytes of the cache. | By | Sum(Int) | <ul> <li>cache_name</li> </ul> |
+| **elasticsearch.node.cache.evictions** | The number of evictions from the cache on a node. | {evictions} | Sum(Int) | <ul> <li>cache_name</li> </ul> |
+| **elasticsearch.node.cache.memory.usage** | The size in bytes of the cache on a node. | By | Sum(Int) | <ul> <li>cache_name</li> </ul> |
 | **elasticsearch.node.cluster.connections** | The number of open tcp connections for internal cluster communication. | {connections} | Sum(Int) | <ul> </ul> |
 | **elasticsearch.node.cluster.io** | The number of bytes sent and received on the network for internal cluster communication. | By | Sum(Int) | <ul> <li>direction</li> </ul> |
 | **elasticsearch.node.cluster.io.received** | The number of bytes received on the network for internal cluster communication. | By | Sum(Int) | <ul> </ul> |

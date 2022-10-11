@@ -31,6 +31,7 @@ type MetricsSettings struct {
 	ElasticsearchClusterStateQueue                            MetricSettings `mapstructure:"elasticsearch.cluster.state_queue"`
 	ElasticsearchClusterStateUpdateCount                      MetricSettings `mapstructure:"elasticsearch.cluster.state_update.count"`
 	ElasticsearchClusterStateUpdateTime                       MetricSettings `mapstructure:"elasticsearch.cluster.state_update.time"`
+	ElasticsearchIndexCacheEvictions                          MetricSettings `mapstructure:"elasticsearch.index.cache.evictions"`
 	ElasticsearchIndexCacheMemoryUsage                        MetricSettings `mapstructure:"elasticsearch.index.cache.memory.usage"`
 	ElasticsearchIndexOperationsCompleted                     MetricSettings `mapstructure:"elasticsearch.index.operations.completed"`
 	ElasticsearchIndexOperationsMergeDocsCount                MetricSettings `mapstructure:"elasticsearch.index.operations.merge.docs_count"`
@@ -140,6 +141,9 @@ func DefaultMetricsSettings() MetricsSettings {
 			Enabled: true,
 		},
 		ElasticsearchClusterStateUpdateTime: MetricSettings{
+			Enabled: true,
+		},
+		ElasticsearchIndexCacheEvictions: MetricSettings{
 			Enabled: true,
 		},
 		ElasticsearchIndexCacheMemoryUsage: MetricSettings{
@@ -1607,6 +1611,60 @@ func newMetricElasticsearchClusterStateUpdateTime(settings MetricSettings) metri
 	return m
 }
 
+type metricElasticsearchIndexCacheEvictions struct {
+	data     pmetric.Metric // data buffer for generated metric.
+	settings MetricSettings // metric settings provided by user.
+	capacity int            // max observed number of data points added to the metric.
+}
+
+// init fills elasticsearch.index.cache.evictions metric with initial data.
+func (m *metricElasticsearchIndexCacheEvictions) init() {
+	m.data.SetName("elasticsearch.index.cache.evictions")
+	m.data.SetDescription("The number of evictions from the cache for an index.")
+	m.data.SetUnit("{evictions}")
+	m.data.SetEmptySum()
+	m.data.Sum().SetIsMonotonic(true)
+	m.data.Sum().SetAggregationTemporality(pmetric.AggregationTemporalityCumulative)
+	m.data.Sum().DataPoints().EnsureCapacity(m.capacity)
+}
+
+func (m *metricElasticsearchIndexCacheEvictions) recordDataPoint(start pcommon.Timestamp, ts pcommon.Timestamp, val int64, cacheNameAttributeValue string, indexAggregationTypeAttributeValue string) {
+	if !m.settings.Enabled {
+		return
+	}
+	dp := m.data.Sum().DataPoints().AppendEmpty()
+	dp.SetStartTimestamp(start)
+	dp.SetTimestamp(ts)
+	dp.SetIntValue(val)
+	dp.Attributes().PutStr("cache_name", cacheNameAttributeValue)
+	dp.Attributes().PutStr("aggregation", indexAggregationTypeAttributeValue)
+}
+
+// updateCapacity saves max length of data point slices that will be used for the slice capacity.
+func (m *metricElasticsearchIndexCacheEvictions) updateCapacity() {
+	if m.data.Sum().DataPoints().Len() > m.capacity {
+		m.capacity = m.data.Sum().DataPoints().Len()
+	}
+}
+
+// emit appends recorded metric data to a metrics slice and prepares it for recording another set of data points.
+func (m *metricElasticsearchIndexCacheEvictions) emit(metrics pmetric.MetricSlice) {
+	if m.settings.Enabled && m.data.Sum().DataPoints().Len() > 0 {
+		m.updateCapacity()
+		m.data.MoveTo(metrics.AppendEmpty())
+		m.init()
+	}
+}
+
+func newMetricElasticsearchIndexCacheEvictions(settings MetricSettings) metricElasticsearchIndexCacheEvictions {
+	m := metricElasticsearchIndexCacheEvictions{settings: settings}
+	if settings.Enabled {
+		m.data = pmetric.NewMetric()
+		m.init()
+	}
+	return m
+}
+
 type metricElasticsearchIndexCacheMemoryUsage struct {
 	data     pmetric.Metric // data buffer for generated metric.
 	settings MetricSettings // metric settings provided by user.
@@ -2300,7 +2358,7 @@ type metricElasticsearchNodeCacheEvictions struct {
 // init fills elasticsearch.node.cache.evictions metric with initial data.
 func (m *metricElasticsearchNodeCacheEvictions) init() {
 	m.data.SetName("elasticsearch.node.cache.evictions")
-	m.data.SetDescription("The number of evictions from the cache.")
+	m.data.SetDescription("The number of evictions from the cache on a node.")
 	m.data.SetUnit("{evictions}")
 	m.data.SetEmptySum()
 	m.data.Sum().SetIsMonotonic(true)
@@ -2353,7 +2411,7 @@ type metricElasticsearchNodeCacheMemoryUsage struct {
 // init fills elasticsearch.node.cache.memory.usage metric with initial data.
 func (m *metricElasticsearchNodeCacheMemoryUsage) init() {
 	m.data.SetName("elasticsearch.node.cache.memory.usage")
-	m.data.SetDescription("The size in bytes of the cache.")
+	m.data.SetDescription("The size in bytes of the cache on a node.")
 	m.data.SetUnit("By")
 	m.data.SetEmptySum()
 	m.data.Sum().SetIsMonotonic(false)
@@ -4977,6 +5035,7 @@ type MetricsBuilder struct {
 	metricElasticsearchClusterStateQueue                            metricElasticsearchClusterStateQueue
 	metricElasticsearchClusterStateUpdateCount                      metricElasticsearchClusterStateUpdateCount
 	metricElasticsearchClusterStateUpdateTime                       metricElasticsearchClusterStateUpdateTime
+	metricElasticsearchIndexCacheEvictions                          metricElasticsearchIndexCacheEvictions
 	metricElasticsearchIndexCacheMemoryUsage                        metricElasticsearchIndexCacheMemoryUsage
 	metricElasticsearchIndexOperationsCompleted                     metricElasticsearchIndexOperationsCompleted
 	metricElasticsearchIndexOperationsMergeDocsCount                metricElasticsearchIndexOperationsMergeDocsCount
@@ -5073,6 +5132,7 @@ func NewMetricsBuilder(settings MetricsSettings, buildInfo component.BuildInfo, 
 		metricElasticsearchClusterStateQueue:                            newMetricElasticsearchClusterStateQueue(settings.ElasticsearchClusterStateQueue),
 		metricElasticsearchClusterStateUpdateCount:                      newMetricElasticsearchClusterStateUpdateCount(settings.ElasticsearchClusterStateUpdateCount),
 		metricElasticsearchClusterStateUpdateTime:                       newMetricElasticsearchClusterStateUpdateTime(settings.ElasticsearchClusterStateUpdateTime),
+		metricElasticsearchIndexCacheEvictions:                          newMetricElasticsearchIndexCacheEvictions(settings.ElasticsearchIndexCacheEvictions),
 		metricElasticsearchIndexCacheMemoryUsage:                        newMetricElasticsearchIndexCacheMemoryUsage(settings.ElasticsearchIndexCacheMemoryUsage),
 		metricElasticsearchIndexOperationsCompleted:                     newMetricElasticsearchIndexOperationsCompleted(settings.ElasticsearchIndexOperationsCompleted),
 		metricElasticsearchIndexOperationsMergeDocsCount:                newMetricElasticsearchIndexOperationsMergeDocsCount(settings.ElasticsearchIndexOperationsMergeDocsCount),
@@ -5225,6 +5285,7 @@ func (mb *MetricsBuilder) EmitForResource(rmo ...ResourceMetricsOption) {
 	mb.metricElasticsearchClusterStateQueue.emit(ils.Metrics())
 	mb.metricElasticsearchClusterStateUpdateCount.emit(ils.Metrics())
 	mb.metricElasticsearchClusterStateUpdateTime.emit(ils.Metrics())
+	mb.metricElasticsearchIndexCacheEvictions.emit(ils.Metrics())
 	mb.metricElasticsearchIndexCacheMemoryUsage.emit(ils.Metrics())
 	mb.metricElasticsearchIndexOperationsCompleted.emit(ils.Metrics())
 	mb.metricElasticsearchIndexOperationsMergeDocsCount.emit(ils.Metrics())
@@ -5377,6 +5438,11 @@ func (mb *MetricsBuilder) RecordElasticsearchClusterStateUpdateCountDataPoint(ts
 // RecordElasticsearchClusterStateUpdateTimeDataPoint adds a data point to elasticsearch.cluster.state_update.time metric.
 func (mb *MetricsBuilder) RecordElasticsearchClusterStateUpdateTimeDataPoint(ts pcommon.Timestamp, val int64, clusterStateUpdateStateAttributeValue string, clusterStateUpdateTypeAttributeValue AttributeClusterStateUpdateType) {
 	mb.metricElasticsearchClusterStateUpdateTime.recordDataPoint(mb.startTime, ts, val, clusterStateUpdateStateAttributeValue, clusterStateUpdateTypeAttributeValue.String())
+}
+
+// RecordElasticsearchIndexCacheEvictionsDataPoint adds a data point to elasticsearch.index.cache.evictions metric.
+func (mb *MetricsBuilder) RecordElasticsearchIndexCacheEvictionsDataPoint(ts pcommon.Timestamp, val int64, cacheNameAttributeValue AttributeCacheName, indexAggregationTypeAttributeValue AttributeIndexAggregationType) {
+	mb.metricElasticsearchIndexCacheEvictions.recordDataPoint(mb.startTime, ts, val, cacheNameAttributeValue.String(), indexAggregationTypeAttributeValue.String())
 }
 
 // RecordElasticsearchIndexCacheMemoryUsageDataPoint adds a data point to elasticsearch.index.cache.memory.usage metric.
