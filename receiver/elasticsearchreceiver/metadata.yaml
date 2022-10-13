@@ -830,3 +830,12 @@ metrics:
       value_type: int
     attributes: [index_aggregation_type]
     enabled: true
+  elasticsearch.index.cache.memory.usage:
+    description: The size in bytes of the cache for an index.
+    unit: By
+    sum:
+      monotonic: false
+      aggregation: cumulative
+      value_type: int
+    attributes: [cache_name, index_aggregation_type]
+    enabled: true
