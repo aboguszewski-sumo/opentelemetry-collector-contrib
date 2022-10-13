@@ -24,6 +24,7 @@ These are the metrics available for this scraper.
 | **elasticsearch.cluster.state_update.time** | The cumulative amount of time updating the cluster state since the node started. | ms | Sum(Int) | <ul> <li>cluster_state_update_state</li> <li>cluster_state_update_type</li> </ul> |
 | **elasticsearch.index.operations.completed** | The number of operations completed for an index. | {operations} | Sum(Int) | <ul> <li>operation</li> <li>index_aggregation_type</li> </ul> |
 | **elasticsearch.index.operations.time** | Time spent on operations for an index. | ms | Sum(Int) | <ul> <li>operation</li> <li>index_aggregation_type</li> </ul> |
+| **elasticsearch.index.shards.size** | The size of the shards assigned to this index. | By | Sum(Int) | <ul> <li>index_aggregation_type</li> </ul> |
 | **elasticsearch.index.translog.operations** | Number of transaction log operations for an index. | {operations} | Sum(Int) | <ul> <li>index_aggregation_type</li> </ul> |
 | **elasticsearch.index.translog.size** | Size of the transaction log for an index. | By | Sum(Int) | <ul> <li>index_aggregation_type</li> </ul> |
 | **elasticsearch.indexing_pressure.memory.limit** | Configured memory limit, in bytes, for the indexing requests. | By | Gauge(Int) | <ul> </ul> |
