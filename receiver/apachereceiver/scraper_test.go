@@ -51,7 +51,8 @@ func TestScraper(t *testing.T) {
 	expectedMetrics, err := golden.ReadMetrics(expectedFile)
 	require.NoError(t, err)
 
-	require.NoError(t, scrapertest.CompareMetrics(expectedMetrics, actualMetrics))
+	// The port is random, so we shouldn't check if this value matches.
+	require.NoError(t, scrapertest.CompareMetrics(expectedMetrics, actualMetrics, scrapertest.IgnoreResourceAttributeValue("apache.server.port")))
 }
 
 func TestScraperFailedStart(t *testing.T) {

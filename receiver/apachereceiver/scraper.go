@@ -129,7 +129,7 @@ func (r *apacheScraper) scrape(context.Context) (pmetric.Metrics, error) {
 		}
 	}
 
-	r.mb.EmitForResource(metadata.WithApacheServerName(r.cfg.serverName))
+	r.mb.EmitForResource(metadata.WithApacheServerName(r.cfg.serverName), metadata.WithApacheServerPort(r.cfg.port))
 
 	return r.mb.Emit(), errs.Combine()
 }
