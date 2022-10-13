@@ -5463,6 +5463,25 @@
                               ],
                               "startTimeUnixNano": "1661811689941624000",
                               "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "10",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "refresh"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
                            }
                         ]
                      },
@@ -5545,6 +5564,25 @@
                                     "key": "aggregation",
                                     "value": {
                                        "stringValue": "primary_shards"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "169",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "refresh"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
                                     }
                                  }
                               ],
@@ -5665,6 +5703,25 @@
                               ],
                               "startTimeUnixNano": "1661811689941624000",
                               "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "10",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "refresh"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
                            }
                         ]
                      },
@@ -5747,6 +5804,25 @@
                                     "key": "aggregation",
                                     "value": {
                                        "stringValue": "primary_shards"
+                                    }
+                                 }
+                              ],
+                              "startTimeUnixNano": "1661811689941624000",
+                              "timeUnixNano": "1661811689943245000"
+                           },
+                           {
+                              "asInt": "169",
+                              "attributes": [
+                                 {
+                                    "key": "operation",
+                                    "value": {
+                                       "stringValue": "refresh"
+                                    }
+                                 },
+                                 {
+                                    "key": "aggregation",
+                                    "value": {
+                                       "stringValue": "total"
                                     }
                                  }
                               ],

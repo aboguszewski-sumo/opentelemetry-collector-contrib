@@ -383,7 +383,7 @@ func (r *elasticsearchScraper) scrapeIndicesMetrics(ctx context.Context, now pco
 	indexStats, err := r.client.IndexStats(ctx, r.cfg.Indices)
 
 	if err != nil {
-		errs.AddPartial(8, err)
+		errs.AddPartial(10, err)
 		return
 	}
 
@@ -408,6 +408,9 @@ func (r *elasticsearchScraper) scrapeOneIndexMetrics(now pcommon.Timestamp, name
 	r.mb.RecordElasticsearchIndexOperationsCompletedDataPoint(
 		now, stats.Total.IndexingOperations.DeleteTotal, metadata.AttributeOperationDelete, metadata.AttributeIndexAggregationTypeTotal,
 	)
+	r.mb.RecordElasticsearchIndexOperationsCompletedDataPoint(
+		now, stats.Total.RefreshOperations.Total, metadata.AttributeOperationRefresh, metadata.AttributeIndexAggregationTypeTotal,
+	)
 
 	r.mb.RecordElasticsearchIndexOperationsTimeDataPoint(
 		now, stats.Total.SearchOperations.FetchTimeInMs, metadata.AttributeOperationFetch, metadata.AttributeIndexAggregationTypeTotal,
@@ -420,6 +423,9 @@ func (r *elasticsearchScraper) scrapeOneIndexMetrics(now pcommon.Timestamp, name
 	)
 	r.mb.RecordElasticsearchIndexOperationsTimeDataPoint(
 		now, stats.Total.IndexingOperations.IndexTimeInMs, metadata.AttributeOperationIndex, metadata.AttributeIndexAggregationTypeTotal,
+	)
+	r.mb.RecordElasticsearchIndexOperationsTimeDataPoint(
+		now, stats.Total.RefreshOperations.TotalTimeInMs, metadata.AttributeOperationRefresh, metadata.AttributeIndexAggregationTypeTotal,
 	)
 
 	r.mb.EmitForResource(metadata.WithElasticsearchIndexName(name), metadata.WithElasticsearchClusterName(r.clusterName))
