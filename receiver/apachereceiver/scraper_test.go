@@ -41,7 +41,7 @@ func TestScraper(t *testing.T) {
 	require.NoError(t, cfg.Validate())
 
 	// Let this test check if it works with the feature enabled and the integration test will test the feature disabled.
-	err := featuregate.GetRegistry().Apply(map[string]bool{EmitServerNameAsResourceAttribute: true})
+	err := featuregate.GetRegistry().Apply(map[string]bool{EmitServerNameAsResourceAttribute: true, EmitPortAsResourceAttribute: false})
 
 	require.NoError(t, err)
 
@@ -57,7 +57,8 @@ func TestScraper(t *testing.T) {
 	expectedMetrics, err := golden.ReadMetrics(expectedFile)
 	require.NoError(t, err)
 
-	require.NoError(t, scrapertest.CompareMetrics(expectedMetrics, actualMetrics))
+	// The port is random, so we shouldn't check if this value matches.
+	require.NoError(t, scrapertest.CompareMetrics(expectedMetrics, actualMetrics, scrapertest.IgnoreResourceAttributeValue("apache.server.port")))
 }
 
 func TestScraperFailedStart(t *testing.T) {
