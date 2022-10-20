@@ -383,6 +383,15 @@ metrics:
       value_type: int
     attributes: [ ]
     enabled: true
+  elasticsearch.node.segments.memory:
+    description: Size of memory for a segment object on a node.
+    unit: By
+    sum:
+      monotonic: false
+      aggregation: cumulative
+      value_type: int
+    attributes: [segments_memory_object_type]
+    enabled: true
   elasticsearch.node.translog.operations:
     description: Number of transaction log operations.
     unit: "{operations}"

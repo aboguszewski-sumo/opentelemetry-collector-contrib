@@ -126,7 +126,7 @@
         "segments": {
           "count": 0,
           "memory_in_bytes": 0,
-          "terms_memory_in_bytes": 0,
+          "terms_memory_in_bytes": 2560,
           "stored_fields_memory_in_bytes": 0,
           "term_vectors_memory_in_bytes": 0,
           "norms_memory_in_bytes": 0,
@@ -134,7 +134,7 @@
           "doc_values_memory_in_bytes": 0,
           "index_writer_memory_in_bytes": 0,
           "version_map_memory_in_bytes": 0,
-          "fixed_bit_set_memory_in_bytes": 0,
+          "fixed_bit_set_memory_in_bytes": 21,
           "max_unsafe_auto_id_timestamp": -9223372036854775808,
           "file_sizes": {}
         },
