@@ -19,14 +19,22 @@ This exporter targets to support proto/json format.
 
 The following exporter configuration parameters are supported. 
 
-| Name           | Description                                           | Default  |
-|:---------------|:------------------------------------------------------|----------|
-| `region`       | AWS region.                                           |          |
-| `s3_bucket`    | S3 bucket                                             |          |
-| `s3_prefix`    | prefix for the S3 key (root directory inside bucket). |          |
-| `s3_partition` | time granularity of S3 key: hour or minute            | "minute" |
-| `file_prefix`  | file prefix defined by user                           |          |
-| `marshaler`    | marshaler used to produce output data otlp_json       |          |
+| Name           | Description                                           | Default     |
+|:---------------|:------------------------------------------------------|-------------|
+| `region`       | AWS region.                                           |             |
+| `s3_bucket`    | S3 bucket                                             |             |
+| `s3_prefix`    | prefix for the S3 key (root directory inside bucket). |             |
+| `s3_partition` | time granularity of S3 key: hour or minute            | "minute"    |
+| `file_prefix`  | file prefix defined by user                           |             |
+| `marshaler`    | marshaler used to produce output data, see below      | `otlp_json` |
+
+### Marshaler
+
+Marshaler determines the format of data sent to AWS S3. Currently, the following marshalers are implemented:
+
+- `otlp_json` (default): the [OpenTelemetry Protocol format](https://github.com/open-telemetry/opentelemetry-proto), represented as json.
+- `sumo_ic`: the format of [Sumo Logic Installed Collector](https://help.sumologic.com/docs/send-data/installed-collectors/).
+  **This format is supported only for logs.**
 
 # Example Configuration
 
