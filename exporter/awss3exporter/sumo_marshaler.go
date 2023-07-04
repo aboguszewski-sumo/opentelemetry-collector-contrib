@@ -21,16 +21,14 @@ const (
 	logBodyKey = "log"
 )
 
-type SumoMarshaler struct {
-	format string
+type sumoMarshaler struct{}
+
+func (marshaler *sumoMarshaler) format() string {
+	return string(SumoIC)
 }
 
-func (marshaler *SumoMarshaler) Format() string {
-	return marshaler.format
-}
-
-func NewSumoMarshaler() SumoMarshaler {
-	return SumoMarshaler{}
+func newSumoICMarshaler() sumoMarshaler {
+	return sumoMarshaler{}
 }
 
 func logEntry(buf *bytes.Buffer, format string, a ...interface{}) {
@@ -75,7 +73,7 @@ const (
 	SourceNameKey     = "_sourceName"
 )
 
-func (SumoMarshaler) MarshalLogs(ld plog.Logs) ([]byte, error) {
+func (sumoMarshaler) MarshalLogs(ld plog.Logs) ([]byte, error) {
 	buf := bytes.Buffer{}
 	rls := ld.ResourceLogs()
 	for i := 0; i < rls.Len(); i++ {
@@ -83,15 +81,15 @@ func (SumoMarshaler) MarshalLogs(ld plog.Logs) ([]byte, error) {
 		ra := rl.Resource().Attributes()
 		sourceCategory, exists := ra.Get(SourceCategoryKey)
 		if !exists {
-			return nil, errors.New("_sourceCategory attribute does not exists")
+			return nil, errors.New("_sourceCategory attribute does not exist")
 		}
 		sourceHost, exists := ra.Get(SourceHostKey)
 		if !exists {
-			return nil, errors.New("_sourceHost attribute does not exists")
+			return nil, errors.New("_sourceHost attribute does not exist")
 		}
 		sourceName, exists := ra.Get(SourceNameKey)
 		if !exists {
-			return nil, errors.New("_sourceName attribute does not exists")
+			return nil, errors.New("_sourceName attribute does not exist")
 		}
 
 		sc, err := attributeValueToString(sourceCategory)
@@ -152,10 +150,10 @@ func getMessageJSON(lr plog.LogRecord) (string, error) {
 	return strings.Trim(message.String(), "\n"), err
 }
 
-func (SumoMarshaler) MarshalTraces(_ ptrace.Traces) ([]byte, error) {
-	return nil, nil
+func (s sumoMarshaler) MarshalTraces(_ ptrace.Traces) ([]byte, error) {
+	return nil, fmt.Errorf("traces can't be marshaled into %s format", s.format())
 }
 
-func (SumoMarshaler) MarshalMetrics(_ pmetric.Metrics) ([]byte, error) {
-	return nil, nil
+func (s sumoMarshaler) MarshalMetrics(_ pmetric.Metrics) ([]byte, error) {
+	return nil, fmt.Errorf("metrics can't be marshaled into %s format", s.format())
 }
