@@ -296,3 +296,35 @@ func (r *metricsReceiver) recordHostConfigMetrics(now pcommon.Timestamp, contain
 	}
 	return nil
 }
+
+type logsReceiver struct {
+	config   *Config
+	settings receiver.CreateSettings
+	client   *docker.Client
+}
+
+func newLogsReceiver(set receiver.CreateSettings, config *Config) *logsReceiver {
+	return &logsReceiver{
+		config:   config,
+		settings: set,
+	}
+}
+
+func (r *logsReceiver) start(ctx context.Context, _ component.Host) error {
+	dConfig, err := docker.NewConfig(r.config.Endpoint, r.config.Timeout, r.config.ExcludedImages, r.config.DockerAPIVersion)
+	if err != nil {
+		return err
+	}
+
+	r.client, err = docker.NewDockerClient(dConfig, r.settings.Logger)
+	if err != nil {
+		return err
+	}
+
+	if err = r.client.LoadContainerList(ctx); err != nil {
+		return err
+	}
+
+	go r.client.EventToLogsLoop(ctx)
+	return nil
+}
