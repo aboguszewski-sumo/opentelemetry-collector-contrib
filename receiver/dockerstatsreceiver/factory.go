@@ -28,7 +28,9 @@ func NewFactory() receiver.Factory {
 	return receiver.NewFactory(
 		metadata.Type,
 		createDefaultConfig,
-		receiver.WithMetrics(createMetricsReceiver, metadata.MetricsStability))
+		receiver.WithMetrics(createMetricsReceiver, metadata.MetricsStability),
+		receiver.WithLogs(createLogsReceiver, component.StabilityLevelAlpha),
+	)
 }
 
 func createDefaultConfig() component.Config {
@@ -40,6 +42,9 @@ func createDefaultConfig() component.Config {
 		Endpoint:                  "unix:///var/run/docker.sock",
 		DockerAPIVersion:          defaultDockerAPIVersion,
 		MetricsBuilderConfig:      metadata.DefaultMetricsBuilderConfig(),
+		EventsConfig: eventsConfig{
+			Enabled: false,
+		},
 	}
 }
 
@@ -58,4 +63,16 @@ func createMetricsReceiver(
 	}
 
 	return scraperhelper.NewScraperControllerReceiver(&dsr.config.ScraperControllerSettings, params, consumer, scraperhelper.AddScraper(scrp))
+}
+
+func createLogsReceiver(
+	_ context.Context,
+	params receiver.CreateSettings,
+	config component.Config,
+	consumer consumer.Logs,
+) (receiver.Logs, error) {
+	dockerConfig := config.(*Config)
+	lr := newLogsReceiver(params, dockerConfig, consumer)
+
+	return lr, nil
 }

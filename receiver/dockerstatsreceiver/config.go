@@ -43,6 +43,12 @@ type Config struct {
 
 	// MetricsBuilderConfig config. Enable or disable stats by name.
 	metadata.MetricsBuilderConfig `mapstructure:",squash"`
+
+	EventsConfig eventsConfig `mapstructure:"events"`
+}
+
+type eventsConfig struct {
+	Enabled bool
 }
 
 func (config Config) Validate() error {
