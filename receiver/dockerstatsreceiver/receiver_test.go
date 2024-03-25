@@ -385,6 +385,7 @@ func dockerMockServer(urlToFile *map[string]string) (*httptest.Server, error) {
 			rw.WriteHeader(http.StatusNotFound)
 			return
 		}
+
 		rw.WriteHeader(http.StatusOK)
 		_, _ = rw.Write(data)
 	})), nil
@@ -422,6 +423,11 @@ func (cb *testConfigBuilder) withDefaultLabels() *testConfigBuilder {
 		"container.label":   "container-metric-label",
 		"container.label.2": "container-metric-label-2",
 	}
+	return cb
+}
+
+func (cb *testConfigBuilder) withEventsEnabled(enabled bool) *testConfigBuilder {
+	cb.config.EventsConfig.Enabled = enabled
 	return cb
 }
 

@@ -1,0 +1,32 @@
+resourceLogs:
+  - resource: {}
+    scopeLogs:
+      - logRecords:
+          - attributes:
+              - key: container.event.type
+                value:
+                  stringValue: container
+              - key: container.event.id
+                value:
+                  stringValue: a996c95aea0b6808c2e3c9063b9253be5d134c99f71165220e839366c2627319
+              - key: container.event.scope
+                value:
+                  stringValue: local
+              - key: container.event.actor.image
+                value:
+                  stringValue: nginx
+              - key: container.event.actor.maintainer
+                value:
+                  stringValue: NGINX Docker Maintainers <docker-maint@nginx.com>
+              - key: container.event.actor.name
+                value:
+                  stringValue: some-nginx3
+              - key: container.event.actor.signal
+                value:
+                  stringValue: "9"
+            body:
+              stringValue: kill
+            spanId: ""
+            timeUnixNano: "1710232268000000000"
+            traceId: ""
+        scope: {}

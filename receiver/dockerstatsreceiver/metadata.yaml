@@ -1,10 +1,10 @@
 type: docker_stats
-scope_name: otelcol/dockerstatsreceiver
+# scope_name: otelcol/dockerstatsreceiver
 
 status:
   class: receiver
   stability:
-    alpha: [metrics]
+    alpha: [metrics, logs]
   distributions: [contrib, observiq, sumo]
   codeowners:
     active: [rmfitzpatrick, jamesmoessis]
