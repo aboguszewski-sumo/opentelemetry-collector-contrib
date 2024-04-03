@@ -17,6 +17,9 @@ import (
 	devents "github.com/docker/docker/api/types/events"
 	dfilters "github.com/docker/docker/api/types/filters"
 	docker "github.com/docker/docker/client"
+	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/pdata/pcommon"
+	"go.opentelemetry.io/collector/pdata/plog"
 	"go.uber.org/zap"
 )
 
@@ -343,4 +346,110 @@ func ContainerEnvToMap(env []string) map[string]string {
 		out[parts[0]] = parts[1]
 	}
 	return out
+}
+
+// TODO: name and file location subject to change
+func (dc *Client) EventToLogsLoop(ctx context.Context, consumer consumer.Logs, returnChan chan struct{}) {
+	// Modified version of internal/docker/ContainerEventLoop
+
+	filters := dfilters.NewArgs()
+	lastTime := time.Now()
+
+EVENT_LOOP:
+	for {
+		fmt.Println("start event loop")
+		// Check if shutdown
+		select {
+		case _, err := <-returnChan:
+			if err {
+				dc.logger.Error("return channel has been closed")
+			}
+
+			break EVENT_LOOP
+		default:
+		}
+		options := dtypes.EventsOptions{
+			Filters: filters,
+			Since:   lastTime.Format(time.RFC3339Nano),
+		}
+		logs := plog.NewLogs()
+		logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
+		consumeLogs := func() {
+			fmt.Println("consuming logs")
+			if logs.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().Len() > 0 {
+				err := consumer.ConsumeLogs(ctx, logs)
+				if err != nil {
+					fmt.Printf("consuming failed %s\n", err)
+				}
+				l := logs.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords()
+				fmt.Printf("logs consumed: %+v %s\n", l.Len(), l.At(0).Body().Str())
+			} else {
+				fmt.Println("no logs to consume")
+			}
+		}
+
+		eventCh, errCh := dc.Events(ctx, options)
+		fmt.Println("start watching events")
+
+	FETCH_LOOP:
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("done")
+				consumeLogs()
+				return
+			case event := <-eventCh:
+				dc.logger.Debug(
+					"docker event fetched",
+					zap.String("id", event.ID),
+					zap.String("action", event.Action),
+				)
+				fmt.Println("event fetched")
+				newLog := logs.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().AppendEmpty()
+				// TODO: log format
+				newLog.Body().SetStr(event.Action)
+				// This gives us 1s precision. We can alternatively use event.TimeNano to get precision of 1ns
+				newLog.SetTimestamp(pcommon.NewTimestampFromTime(time.Unix(event.Time, 0)))
+				newLog.Attributes().PutStr("container.event.type", event.Type)
+				newLog.Attributes().PutStr("container.event.id", event.Actor.ID)
+				newLog.Attributes().PutStr("container.event.scope", event.Scope)
+
+				for k, v := range event.Actor.Attributes {
+					newLog.Attributes().PutStr(fmt.Sprintf("container.event.actor.%s", k), v)
+				}
+
+				if event.TimeNano > lastTime.UnixNano() {
+					lastTime = time.Unix(0, event.TimeNano)
+				}
+			default:
+				break FETCH_LOOP
+			}
+		}
+		for {
+			select {
+			case err := <-errCh:
+				fmt.Printf("err %+v\n", err)
+				// We are only interested when the context hasn't been canceled since requests made
+				// with a closed context are guaranteed to fail.
+				if ctx.Err() == nil {
+					dc.logger.Error("Error watching docker events", zap.Error(err))
+					// Either decoding or connection error has occurred, so we should resume the event loop after
+					// waiting a moment.  In cases of extended daemon unavailability this will retry until
+					// collector teardown or background context is closed.
+					consumeLogs()
+					select {
+					case <-time.After(3 * time.Second):
+						continue EVENT_LOOP
+					case <-ctx.Done():
+						return
+					}
+				}
+			default:
+				fmt.Println("default")
+				// Default should happen only if no events are fetched and there are no errors
+				consumeLogs()
+				continue EVENT_LOOP
+			}
+		}
+	}
 }
