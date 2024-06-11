@@ -74,7 +74,7 @@ func TestScrapeEventsV2(t *testing.T) {
 
 			require.Eventually(t, func() bool {
 				return sink.LogRecordCount() > 0
-			}, 2*time.Second, 10*time.Millisecond)
+			}, 7*time.Second, 10*time.Millisecond)
 
 			logs := sink.AllLogs()[0]
 			// Uncomment to regenerate 'expected_logs.yaml' files
@@ -86,4 +86,33 @@ func TestScrapeEventsV2(t *testing.T) {
 			require.NoError(t, plogtest.CompareLogs(expectedLogs, logs))
 		})
 	}
+}
+
+func TestScrapeInGeneral(t *testing.T) {
+	t.Run("generic scrape", func(t *testing.T) {
+		sink := &consumertest.LogsSink{}
+
+		receiver := newLogsReceiver(
+			receivertest.NewNopCreateSettings(),
+			newTestConfigBuilder().withEndpoint(daemonSocket).withEventsEnabled(true).withEndpoint(daemonSocket).build(),
+			sink,
+		)
+		err := receiver.Start(context.Background(), componenttest.NewNopHost())
+		require.NoError(t, err)
+
+		time.Sleep(time.Second * 60)
+
+		require.Eventually(t, func() bool {
+			return sink.LogRecordCount() > 0
+		}, 2*time.Second, 10*time.Millisecond)
+
+		logs := sink.AllLogs()[0]
+		// Uncomment to regenerate 'expected_logs.yaml' files
+		golden.WriteLogs(t, "/Users/aboguszewski/opentelemetry-collector-contrib/receiver/dockerstatsreceiver/logstestdata/dump.yaml", logs)
+
+		expectedLogs, err := golden.ReadLogs("/Users/aboguszewski/opentelemetry-collector-contrib/receiver/dockerstatsreceiver/logstestdata/dump.yaml")
+
+		require.NoError(t, err)
+		require.NoError(t, plogtest.CompareLogs(expectedLogs, logs))
+	})
 }

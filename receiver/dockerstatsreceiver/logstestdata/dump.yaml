@@ -8,7 +8,79 @@ resourceLogs:
                   stringValue: container
               - key: container.event.id
                 value:
-                  stringValue: a996c95aea0b6808c2e3c9063b9253be5d134c99f71165220e839366c2627319
+                  stringValue: c5dd4883724fbf02dd3f8d17739c3645dbe9c2d6dc2ddf3e2147c7051394e44a
+              - key: container.event.scope
+                value:
+                  stringValue: local
+              - key: container.event.actor.image
+                value:
+                  stringValue: nginx
+              - key: container.event.actor.maintainer
+                value:
+                  stringValue: NGINX Docker Maintainers <docker-maint@nginx.com>
+              - key: container.event.actor.name
+                value:
+                  stringValue: some-nginx3
+            body:
+              stringValue: create
+            spanId: ""
+            timeUnixNano: "1718110064000000000"
+            traceId: ""
+          - attributes:
+              - key: container.event.type
+                value:
+                  stringValue: network
+              - key: container.event.id
+                value:
+                  stringValue: b6524d99a7963377802b7869b570ac50d8495c75767c2cebdf2cae33c09bb443
+              - key: container.event.scope
+                value:
+                  stringValue: local
+              - key: container.event.actor.container
+                value:
+                  stringValue: c5dd4883724fbf02dd3f8d17739c3645dbe9c2d6dc2ddf3e2147c7051394e44a
+              - key: container.event.actor.name
+                value:
+                  stringValue: bridge
+              - key: container.event.actor.type
+                value:
+                  stringValue: bridge
+            body:
+              stringValue: connect
+            spanId: ""
+            timeUnixNano: "1718110065000000000"
+            traceId: ""
+          - attributes:
+              - key: container.event.type
+                value:
+                  stringValue: container
+              - key: container.event.id
+                value:
+                  stringValue: c5dd4883724fbf02dd3f8d17739c3645dbe9c2d6dc2ddf3e2147c7051394e44a
+              - key: container.event.scope
+                value:
+                  stringValue: local
+              - key: container.event.actor.name
+                value:
+                  stringValue: some-nginx3
+              - key: container.event.actor.image
+                value:
+                  stringValue: nginx
+              - key: container.event.actor.maintainer
+                value:
+                  stringValue: NGINX Docker Maintainers <docker-maint@nginx.com>
+            body:
+              stringValue: start
+            spanId: ""
+            timeUnixNano: "1718110065000000000"
+            traceId: ""
+          - attributes:
+              - key: container.event.type
+                value:
+                  stringValue: container
+              - key: container.event.id
+                value:
+                  stringValue: c5dd4883724fbf02dd3f8d17739c3645dbe9c2d6dc2ddf3e2147c7051394e44a
               - key: container.event.scope
                 value:
                   stringValue: local
@@ -27,7 +99,7 @@ resourceLogs:
             body:
               stringValue: kill
             spanId: ""
-            timeUnixNano: "1710232268000000000"
+            timeUnixNano: "1718110067000000000"
             traceId: ""
           - attributes:
               - key: container.event.type
@@ -35,7 +107,7 @@ resourceLogs:
                   stringValue: container
               - key: container.event.id
                 value:
-                  stringValue: a996c95aea0b6808c2e3c9063b9253be5d134c99f71165220e839366c2627319
+                  stringValue: c5dd4883724fbf02dd3f8d17739c3645dbe9c2d6dc2ddf3e2147c7051394e44a
               - key: container.event.scope
                 value:
                   stringValue: local
@@ -54,7 +126,7 @@ resourceLogs:
             body:
               stringValue: die
             spanId: ""
-            timeUnixNano: "1710232268000000000"
+            timeUnixNano: "1718110067000000000"
             traceId: ""
           - attributes:
               - key: container.event.type
@@ -62,23 +134,23 @@ resourceLogs:
                   stringValue: network
               - key: container.event.id
                 value:
-                  stringValue: 72632a8ad47f7e06103390edac215d8dc9b2436013828f22ca7b0f284d2b94eb
+                  stringValue: b6524d99a7963377802b7869b570ac50d8495c75767c2cebdf2cae33c09bb443
               - key: container.event.scope
                 value:
                   stringValue: local
-              - key: container.event.actor.type
-                value:
-                  stringValue: bridge
               - key: container.event.actor.container
                 value:
-                  stringValue: a996c95aea0b6808c2e3c9063b9253be5d134c99f71165220e839366c2627319
+                  stringValue: c5dd4883724fbf02dd3f8d17739c3645dbe9c2d6dc2ddf3e2147c7051394e44a
               - key: container.event.actor.name
+                value:
+                  stringValue: bridge
+              - key: container.event.actor.type
                 value:
                   stringValue: bridge
             body:
               stringValue: disconnect
             spanId: ""
-            timeUnixNano: "1710232269000000000"
+            timeUnixNano: "1718110067000000000"
             traceId: ""
           - attributes:
               - key: container.event.type
@@ -86,13 +158,10 @@ resourceLogs:
                   stringValue: container
               - key: container.event.id
                 value:
-                  stringValue: a996c95aea0b6808c2e3c9063b9253be5d134c99f71165220e839366c2627319
+                  stringValue: c5dd4883724fbf02dd3f8d17739c3645dbe9c2d6dc2ddf3e2147c7051394e44a
               - key: container.event.scope
                 value:
                   stringValue: local
-              - key: container.event.actor.signal
-                value:
-                  stringValue: "9"
               - key: container.event.actor.image
                 value:
                   stringValue: nginx
@@ -103,59 +172,8 @@ resourceLogs:
                 value:
                   stringValue: some-nginx3
             body:
-              stringValue: kill
+              stringValue: destroy
             spanId: ""
-            timeUnixNano: "1710232268000000000"
-            traceId: ""
-          - attributes:
-              - key: container.event.type
-                value:
-                  stringValue: container
-              - key: container.event.id
-                value:
-                  stringValue: a996c95aea0b6808c2e3c9063b9253be5d134c99f71165220e839366c2627319
-              - key: container.event.scope
-                value:
-                  stringValue: local
-              - key: container.event.actor.exitCode
-                value:
-                  stringValue: "137"
-              - key: container.event.actor.image
-                value:
-                  stringValue: nginx
-              - key: container.event.actor.maintainer
-                value:
-                  stringValue: NGINX Docker Maintainers <docker-maint@nginx.com>
-              - key: container.event.actor.name
-                value:
-                  stringValue: some-nginx3
-            body:
-              stringValue: die
-            spanId: ""
-            timeUnixNano: "1710232268000000000"
-            traceId: ""
-          - attributes:
-              - key: container.event.type
-                value:
-                  stringValue: network
-              - key: container.event.id
-                value:
-                  stringValue: 72632a8ad47f7e06103390edac215d8dc9b2436013828f22ca7b0f284d2b94eb
-              - key: container.event.scope
-                value:
-                  stringValue: local
-              - key: container.event.actor.container
-                value:
-                  stringValue: a996c95aea0b6808c2e3c9063b9253be5d134c99f71165220e839366c2627319
-              - key: container.event.actor.name
-                value:
-                  stringValue: bridge
-              - key: container.event.actor.type
-                value:
-                  stringValue: bridge
-            body:
-              stringValue: disconnect
-            spanId: ""
-            timeUnixNano: "1710232269000000000"
+            timeUnixNano: "1718110067000000000"
             traceId: ""
         scope: {}

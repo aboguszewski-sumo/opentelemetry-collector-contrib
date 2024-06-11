@@ -355,9 +355,36 @@ func (dc *Client) EventToLogsLoop(ctx context.Context, consumer consumer.Logs, r
 	filters := dfilters.NewArgs()
 	lastTime := time.Now()
 
+	// Logic that generates fetched events as logs
+	INTERVAL := 5 * time.Second
+	var mu sync.Mutex
+
+	logs := plog.NewLogs()
+	logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
+	go func() {
+		for {
+			fmt.Println("emitting loop: start")
+			time.Sleep(INTERVAL)
+			fmt.Println("emitting loop: try to lock")
+			mu.Lock()
+			fmt.Println("emitting loop: locked")
+
+			if logs.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().Len() > 0 {
+				err := consumer.ConsumeLogs(ctx, logs)
+				if err != nil {
+					dc.logger.Warn("consuming docker events failed", zap.Any("error", err))
+					mu.Unlock()
+					continue
+				}
+				logs = plog.NewLogs()
+				logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
+			}
+			mu.Unlock()
+		}
+	}()
+
 EVENT_LOOP:
 	for {
-		fmt.Println("start event loop")
 		// Check if shutdown
 		select {
 		case _, err := <-returnChan:
@@ -372,31 +399,13 @@ EVENT_LOOP:
 			Filters: filters,
 			Since:   lastTime.Format(time.RFC3339Nano),
 		}
-		logs := plog.NewLogs()
-		logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
-		consumeLogs := func() {
-			fmt.Println("consuming logs")
-			if logs.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().Len() > 0 {
-				err := consumer.ConsumeLogs(ctx, logs)
-				if err != nil {
-					fmt.Printf("consuming failed %s\n", err)
-				}
-				l := logs.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords()
-				fmt.Printf("logs consumed: %+v %s\n", l.Len(), l.At(0).Body().Str())
-			} else {
-				fmt.Println("no logs to consume")
-			}
-		}
 
 		eventCh, errCh := dc.Events(ctx, options)
 		fmt.Println("start watching events")
 
-	FETCH_LOOP:
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("done")
-				consumeLogs()
 				return
 			case event := <-eventCh:
 				dc.logger.Debug(
@@ -405,6 +414,8 @@ EVENT_LOOP:
 					zap.String("action", event.Action),
 				)
 				fmt.Println("event fetched")
+				mu.Lock()
+
 				newLog := logs.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().AppendEmpty()
 				// TODO: log format
 				newLog.Body().SetStr(event.Action)
@@ -421,14 +432,10 @@ EVENT_LOOP:
 				if event.TimeNano > lastTime.UnixNano() {
 					lastTime = time.Unix(0, event.TimeNano)
 				}
-			default:
-				break FETCH_LOOP
-			}
-		}
-		for {
-			select {
+				fmt.Println("fetcher: freeing mutex")
+				mu.Unlock()
+
 			case err := <-errCh:
-				fmt.Printf("err %+v\n", err)
 				// We are only interested when the context hasn't been canceled since requests made
 				// with a closed context are guaranteed to fail.
 				if ctx.Err() == nil {
@@ -436,7 +443,6 @@ EVENT_LOOP:
 					// Either decoding or connection error has occurred, so we should resume the event loop after
 					// waiting a moment.  In cases of extended daemon unavailability this will retry until
 					// collector teardown or background context is closed.
-					consumeLogs()
 					select {
 					case <-time.After(3 * time.Second):
 						continue EVENT_LOOP
@@ -444,11 +450,6 @@ EVENT_LOOP:
 						return
 					}
 				}
-			default:
-				fmt.Println("default")
-				// Default should happen only if no events are fetched and there are no errors
-				consumeLogs()
-				continue EVENT_LOOP
 			}
 		}
 	}
